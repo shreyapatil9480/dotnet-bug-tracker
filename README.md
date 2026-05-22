@@ -1,3 +1,5 @@
+[![CI](https://github.com/shreyapatil9480/dotnet-bug-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/shreyapatil9480/dotnet-bug-tracker/actions/workflows/ci.yml)
+
 # dotnet-bug-tracker
 
 A fully tested **Bug Tracker REST API** built with **ASP.NET Core (.NET 8)**, **Entity Framework Core**, and **SQLite**. This is a portfolio project demonstrating C# application development, REST API design, software testing, and CI/CD automation.
