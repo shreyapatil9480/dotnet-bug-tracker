@@ -4,6 +4,7 @@ using BugTracker.Core.Entities;
 using BugTracker.Core.Enums;
 using BugTracker.Core.Exceptions;
 using BugTracker.Core.Interfaces;
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -52,9 +53,9 @@ public class CommentServiceTests
         var result = await _commentService.AddCommentAsync(1, request);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(request.Text, result.Text);
-        Assert.Equal(1, result.BugId);
+        result.Should().NotBeNull();
+        result.Text.Should().Be(request.Text);
+        result.BugId.Should().Be(1);
         _mockCommentRepository.Verify(r => r.AddAsync(It.IsAny<Comment>()), Times.Once);
     }
 
@@ -83,7 +84,7 @@ public class CommentServiceTests
         var result = await _commentService.AddCommentAsync(1, request);
 
         // Assert
-        Assert.NotNull(result);
+        result.Should().NotBeNull();
     }
 
     [Fact]
@@ -111,7 +112,7 @@ public class CommentServiceTests
         var result = await _commentService.AddCommentAsync(1, request);
 
         // Assert
-        Assert.NotNull(result);
+        result.Should().NotBeNull();
     }
 
     [Fact]
@@ -132,7 +133,7 @@ public class CommentServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ValidationException>(
             () => _commentService.AddCommentAsync(1, request));
-        Assert.Contains("closed", exception.Message.ToLower());
+        exception.Message.ToLower().Should().Contain("closed");
     }
 
     [Fact]
@@ -145,7 +146,7 @@ public class CommentServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NotFoundException>(
             () => _commentService.AddCommentAsync(999, request));
-        Assert.Contains("Bug", exception.Message);
+        exception.Message.Should().Contain("Bug");
     }
 
     [Fact]
@@ -166,7 +167,7 @@ public class CommentServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ValidationException>(
             () => _commentService.AddCommentAsync(1, request));
-        Assert.Contains("text", exception.Message.ToLower());
+        exception.Message.ToLower().Should().Contain("text");
     }
 
     #endregion
@@ -191,11 +192,11 @@ public class CommentServiceTests
         var result = await _commentService.GetCommentsByBugIdAsync(1);
 
         // Assert
-        Assert.Equal(3, result.Count());
+        result.Should().HaveCount(3);
         var resultList = result.ToList();
-        Assert.Equal("First comment", resultList[0].Text);
-        Assert.Equal("Second comment", resultList[1].Text);
-        Assert.Equal("Third comment", resultList[2].Text);
+        resultList[0].Text.Should().Be("First comment");
+        resultList[1].Text.Should().Be("Second comment");
+        resultList[2].Text.Should().Be("Third comment");
     }
 
     [Fact]
@@ -220,8 +221,8 @@ public class CommentServiceTests
         var result = await _commentService.GetCommentsByBugIdAsync(1);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result);
+        result.Should().NotBeNull();
+        result.Should().BeEmpty();
     }
 
     #endregion

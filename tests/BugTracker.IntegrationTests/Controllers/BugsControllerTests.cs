@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using BugTracker.API.DTOs;
 using BugTracker.Core.Enums;
+using FluentAssertions;
 using Xunit;
 
 namespace BugTracker.IntegrationTests.Controllers;
@@ -42,12 +43,12 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync($"/api/bugs/{createdBug!.Id}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var bug = await response.Content.ReadFromJsonAsync<BugResponse>();
-        Assert.NotNull(bug);
-        Assert.Equal(bugRequest.Title, bug.Title);
-        Assert.Equal(BugSeverity.Critical, bug.Severity);
-        Assert.Equal(BugStatus.Open, bug.Status);
+        bug.Should().NotBeNull();
+        bug!.Title.Should().Be(bugRequest.Title);
+        bug.Severity.Should().Be(BugSeverity.Critical);
+        bug.Status.Should().Be(BugStatus.Open);
     }
 
     [Fact]
@@ -57,7 +58,7 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync("/api/bugs/99999");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     #endregion
@@ -86,10 +87,10 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PutAsJsonAsync($"/api/bugs/{createdBug!.Id}", updateRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var bug = await response.Content.ReadFromJsonAsync<BugResponse>();
-        Assert.NotNull(bug);
-        Assert.Equal(BugStatus.InProgress, bug.Status);
+        bug.Should().NotBeNull();
+        bug!.Status.Should().Be(BugStatus.InProgress);
     }
 
     [Fact]
@@ -115,7 +116,7 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PutAsJsonAsync($"/api/bugs/{createdBug!.Id}", updateRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -142,7 +143,7 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PutAsJsonAsync($"/api/bugs/{createdBug.Id}", updateRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -155,7 +156,7 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PutAsJsonAsync("/api/bugs/99999", updateRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -176,9 +177,9 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PutAsJsonAsync($"/api/bugs/{createdBug!.Id}", updateRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var bug = await response.Content.ReadFromJsonAsync<BugResponse>();
-        Assert.Equal("Updated Title", bug!.Title);
+        bug!.Title.Should().Be("Updated Title");
     }
 
     #endregion
@@ -201,11 +202,11 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.DeleteAsync($"/api/bugs/{createdBug!.Id}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         // Verify bug is deleted
         var getResponse = await _client.GetAsync($"/api/bugs/{createdBug.Id}");
-        Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
+        getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -215,7 +216,7 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.DeleteAsync("/api/bugs/99999");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     #endregion
@@ -240,10 +241,10 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PostAsJsonAsync($"/api/bugs/{createdBug!.Id}/comments", commentRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
         var comment = await response.Content.ReadFromJsonAsync<CommentResponse>();
-        Assert.NotNull(comment);
-        Assert.Equal(commentRequest.Text, comment.Text);
+        comment.Should().NotBeNull();
+        comment!.Text.Should().Be(commentRequest.Text);
     }
 
     [Fact]
@@ -269,7 +270,7 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PostAsJsonAsync($"/api/bugs/{createdBug.Id}/comments", commentRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -282,7 +283,7 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PostAsJsonAsync("/api/bugs/99999/comments", commentRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     #endregion
@@ -308,10 +309,10 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync($"/api/bugs/{createdBug.Id}/comments");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var comments = await response.Content.ReadFromJsonAsync<List<CommentResponse>>();
-        Assert.NotNull(comments);
-        Assert.Equal(2, comments.Count);
+        comments.Should().NotBeNull();
+        comments.Should().HaveCount(2);
     }
 
     [Fact]
@@ -321,7 +322,7 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.GetAsync("/api/bugs/99999/comments");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     #endregion
@@ -344,25 +345,25 @@ public class BugsControllerTests : IClassFixture<CustomWebApplicationFactory>
         };
         var bugCreateResponse = await _client.PostAsJsonAsync($"/api/projects/{project!.Id}/bugs", bugRequest);
         var bug = await bugCreateResponse.Content.ReadFromJsonAsync<BugResponse>();
-        Assert.Equal(BugStatus.Open, bug!.Status);
+        bug!.Status.Should().Be(BugStatus.Open);
 
         // Open -> InProgress
         var response1 = await _client.PutAsJsonAsync($"/api/bugs/{bug.Id}", new UpdateBugRequest { Status = BugStatus.InProgress });
-        Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+        response1.StatusCode.Should().Be(HttpStatusCode.OK);
         var bug1 = await response1.Content.ReadFromJsonAsync<BugResponse>();
-        Assert.Equal(BugStatus.InProgress, bug1!.Status);
+        bug1!.Status.Should().Be(BugStatus.InProgress);
 
         // InProgress -> Resolved
         var response2 = await _client.PutAsJsonAsync($"/api/bugs/{bug.Id}", new UpdateBugRequest { Status = BugStatus.Resolved });
-        Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+        response2.StatusCode.Should().Be(HttpStatusCode.OK);
         var bug2 = await response2.Content.ReadFromJsonAsync<BugResponse>();
-        Assert.Equal(BugStatus.Resolved, bug2!.Status);
+        bug2!.Status.Should().Be(BugStatus.Resolved);
 
         // Resolved -> Closed
         var response3 = await _client.PutAsJsonAsync($"/api/bugs/{bug.Id}", new UpdateBugRequest { Status = BugStatus.Closed });
-        Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+        response3.StatusCode.Should().Be(HttpStatusCode.OK);
         var bug3 = await response3.Content.ReadFromJsonAsync<BugResponse>();
-        Assert.Equal(BugStatus.Closed, bug3!.Status);
+        bug3!.Status.Should().Be(BugStatus.Closed);
     }
 
     #endregion

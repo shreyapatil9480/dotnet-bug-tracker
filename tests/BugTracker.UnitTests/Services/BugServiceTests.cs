@@ -4,6 +4,7 @@ using BugTracker.Core.Entities;
 using BugTracker.Core.Enums;
 using BugTracker.Core.Exceptions;
 using BugTracker.Core.Interfaces;
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -51,11 +52,11 @@ public class BugServiceTests
         var result = await _bugService.CreateBugAsync(projectId, request);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(1, result.Id);
-        Assert.Equal(request.Title, result.Title);
-        Assert.Equal(request.Severity, result.Severity);
-        Assert.Equal(BugStatus.Open, result.Status);
+        result.Should().NotBeNull();
+        result.Id.Should().Be(1);
+        result.Title.Should().Be(request.Title);
+        result.Severity.Should().Be(request.Severity);
+        result.Status.Should().Be(BugStatus.Open);
         _mockBugRepository.Verify(r => r.AddAsync(It.IsAny<Bug>()), Times.Once);
     }
 
@@ -75,7 +76,7 @@ public class BugServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NotFoundException>(
             () => _bugService.CreateBugAsync(projectId, request));
-        Assert.Contains("Project", exception.Message);
+        exception.Message.Should().Contain("Project");
     }
 
     [Fact]
@@ -94,7 +95,7 @@ public class BugServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ValidationException>(
             () => _bugService.CreateBugAsync(projectId, request));
-        Assert.Contains("Title", exception.Message);
+        exception.Message.Should().Contain("Title");
     }
 
     [Fact]
@@ -113,7 +114,7 @@ public class BugServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ValidationException>(
             () => _bugService.CreateBugAsync(projectId, request));
-        Assert.Contains("Severity", exception.Message);
+        exception.Message.Should().Contain("Severity");
     }
 
     #endregion
@@ -141,7 +142,7 @@ public class BugServiceTests
         var result = await _bugService.UpdateBugAsync(1, request);
 
         // Assert
-        Assert.Equal(BugStatus.InProgress, result.Status);
+        result.Status.Should().Be(BugStatus.InProgress);
         _mockBugRepository.Verify(r => r.UpdateAsync(It.Is<Bug>(b => b.Status == BugStatus.InProgress)), Times.Once);
     }
 
@@ -166,7 +167,7 @@ public class BugServiceTests
         var result = await _bugService.UpdateBugAsync(1, request);
 
         // Assert
-        Assert.Equal(BugStatus.Resolved, result.Status);
+        result.Status.Should().Be(BugStatus.Resolved);
     }
 
     [Fact]
@@ -190,7 +191,7 @@ public class BugServiceTests
         var result = await _bugService.UpdateBugAsync(1, request);
 
         // Assert
-        Assert.Equal(BugStatus.Closed, result.Status);
+        result.Status.Should().Be(BugStatus.Closed);
     }
 
     [Fact]
@@ -212,8 +213,8 @@ public class BugServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidStatusTransitionException>(
             () => _bugService.UpdateBugAsync(1, request));
-        Assert.Equal(BugStatus.Closed, exception.CurrentStatus);
-        Assert.Equal(BugStatus.Open, exception.AttemptedStatus);
+        exception.CurrentStatus.Should().Be(BugStatus.Closed);
+        exception.AttemptedStatus.Should().Be(BugStatus.Open);
     }
 
     [Fact]
@@ -235,8 +236,8 @@ public class BugServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidStatusTransitionException>(
             () => _bugService.UpdateBugAsync(1, request));
-        Assert.Contains("Open", exception.Message);
-        Assert.Contains("Resolved", exception.Message);
+        exception.Message.Should().Contain("Open");
+        exception.Message.Should().Contain("Resolved");
     }
 
     [Fact]
@@ -302,7 +303,7 @@ public class BugServiceTests
         var result = await _bugService.UpdateBugAsync(1, request);
 
         // Assert
-        Assert.Equal(BugStatus.Open, result.Status);
+        result.Status.Should().Be(BugStatus.Open);
     }
 
     #endregion
@@ -330,9 +331,9 @@ public class BugServiceTests
         var result = await _bugService.GetBugByIdAsync(1);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(bug.Title, result.Title);
-        Assert.Equal(bug.Severity, result.Severity);
+        result.Should().NotBeNull();
+        result.Title.Should().Be(bug.Title);
+        result.Severity.Should().Be(bug.Severity);
     }
 
     [Fact]
@@ -344,7 +345,7 @@ public class BugServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NotFoundException>(
             () => _bugService.GetBugByIdAsync(999));
-        Assert.Contains("Bug", exception.Message);
+        exception.Message.Should().Contain("Bug");
     }
 
     #endregion
@@ -397,7 +398,7 @@ public class BugServiceTests
         var result = await _bugService.GetBugsByProjectIdAsync(1);
 
         // Assert
-        Assert.Equal(2, result.Count());
+        result.Should().HaveCount(2);
     }
 
     [Fact]

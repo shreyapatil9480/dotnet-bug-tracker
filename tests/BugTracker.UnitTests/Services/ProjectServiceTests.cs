@@ -3,6 +3,7 @@ using BugTracker.API.Services;
 using BugTracker.Core.Entities;
 using BugTracker.Core.Exceptions;
 using BugTracker.Core.Interfaces;
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -52,10 +53,10 @@ public class ProjectServiceTests
         var result = await _projectService.CreateProjectAsync(request);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(1, result.Id);
-        Assert.Equal(request.Name, result.Name);
-        Assert.Equal(request.Description, result.Description);
+        result.Should().NotBeNull();
+        result.Id.Should().Be(1);
+        result.Name.Should().Be(request.Name);
+        result.Description.Should().Be(request.Description);
         _mockProjectRepository.Verify(r => r.AddAsync(It.IsAny<Project>()), Times.Once);
     }
 
@@ -72,7 +73,7 @@ public class ProjectServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ValidationException>(
             () => _projectService.CreateProjectAsync(request));
-        Assert.Contains("name", exception.Message.ToLower());
+        exception.Message.ToLower().Should().Contain("name");
     }
 
     [Fact]
@@ -113,9 +114,9 @@ public class ProjectServiceTests
         await _projectService.CreateProjectAsync(request);
 
         // Assert
-        Assert.NotNull(capturedProject);
-        Assert.Equal("Test Project", capturedProject.Name);
-        Assert.Equal("Test Description", capturedProject.Description);
+        capturedProject.Should().NotBeNull();
+        capturedProject!.Name.Should().Be("Test Project");
+        capturedProject.Description.Should().Be("Test Description");
     }
 
     #endregion
@@ -133,8 +134,8 @@ public class ProjectServiceTests
         var result = await _projectService.GetAllProjectsAsync();
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result);
+        result.Should().NotBeNull();
+        result.Should().BeEmpty();
     }
 
     [Fact]
@@ -153,7 +154,7 @@ public class ProjectServiceTests
         var result = await _projectService.GetAllProjectsAsync();
 
         // Assert
-        Assert.Equal(2, result.Count());
+        result.Should().HaveCount(2);
     }
 
     #endregion
@@ -178,8 +179,8 @@ public class ProjectServiceTests
         var result = await _projectService.GetProjectByIdAsync(1);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(project.Name, result.Name);
+        result.Should().NotBeNull();
+        result.Name.Should().Be(project.Name);
     }
 
     [Fact]
@@ -191,7 +192,7 @@ public class ProjectServiceTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NotFoundException>(
             () => _projectService.GetProjectByIdAsync(999));
-        Assert.Contains("Project", exception.Message);
+        exception.Message.Should().Contain("Project");
     }
 
     #endregion
@@ -249,7 +250,7 @@ public class ProjectServiceTests
         var result = await _projectService.GetProjectByIdAsync(1);
 
         // Assert
-        Assert.Equal(3, result.BugCount);
+        result.BugCount.Should().Be(3);
     }
 
     #endregion

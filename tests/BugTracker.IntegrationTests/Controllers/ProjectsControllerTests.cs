@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using BugTracker.API.DTOs;
 using BugTracker.Core.Enums;
+using FluentAssertions;
 using Xunit;
 
 namespace BugTracker.IntegrationTests.Controllers;
@@ -35,14 +36,14 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.PostAsJsonAsync("/api/projects", request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        Assert.NotNull(response.Headers.Location);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Headers.Location.Should().NotBeNull();
         
         var project = await response.Content.ReadFromJsonAsync<ProjectResponse>();
-        Assert.NotNull(project);
-        Assert.Equal(request.Name, project.Name);
-        Assert.Equal(request.Description, project.Description);
-        Assert.True(project.Id > 0);
+        project.Should().NotBeNull();
+        project!.Name.Should().Be(request.Name);
+        project.Description.Should().Be(request.Description);
+        project.Id.Should().BeGreaterThan(0);
     }
 
     [Fact]
@@ -55,7 +56,7 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.PostAsJsonAsync("/api/projects", request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -68,7 +69,7 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.PostAsJsonAsync("/api/projects", request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     #endregion
@@ -90,10 +91,10 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.GetAsync("/api/projects");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var projects = await response.Content.ReadFromJsonAsync<List<ProjectResponse>>();
-        Assert.NotNull(projects);
-        Assert.NotEmpty(projects);
+        projects.Should().NotBeNull();
+        projects.Should().NotBeEmpty();
     }
 
     #endregion
@@ -116,10 +117,10 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.GetAsync($"/api/projects/{createdProject!.Id}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var project = await response.Content.ReadFromJsonAsync<ProjectResponse>();
-        Assert.NotNull(project);
-        Assert.Equal(createRequest.Name, project.Name);
+        project.Should().NotBeNull();
+        project!.Name.Should().Be(createRequest.Name);
     }
 
     [Fact]
@@ -129,7 +130,7 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.GetAsync("/api/projects/99999");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     #endregion
@@ -160,15 +161,15 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var deleteResponse = await _client.DeleteAsync($"/api/projects/{project.Id}");
 
         // Assert - project deleted
-        Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         // Verify project is gone
         var getProjectResponse = await _client.GetAsync($"/api/projects/{project.Id}");
-        Assert.Equal(HttpStatusCode.NotFound, getProjectResponse.StatusCode);
+        getProjectResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
         // Verify bug is gone (cascade delete)
         var getBugResponse = await _client.GetAsync($"/api/bugs/{bug.Id}");
-        Assert.Equal(HttpStatusCode.NotFound, getBugResponse.StatusCode);
+        getBugResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -178,7 +179,7 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.DeleteAsync("/api/projects/99999");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     #endregion
@@ -204,11 +205,11 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.PostAsJsonAsync($"/api/projects/{project!.Id}/bugs", bugRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
         var bug = await response.Content.ReadFromJsonAsync<BugResponse>();
-        Assert.NotNull(bug);
-        Assert.Equal(bugRequest.Title, bug.Title);
-        Assert.Equal(BugStatus.Open, bug.Status);
+        bug.Should().NotBeNull();
+        bug!.Title.Should().Be(bugRequest.Title);
+        bug.Status.Should().Be(BugStatus.Open);
     }
 
     [Fact]
@@ -226,7 +227,7 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.PostAsJsonAsync($"/api/projects/{project!.Id}/bugs", bugRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -243,7 +244,7 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.PostAsJsonAsync("/api/projects/99999/bugs", bugRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     #endregion
@@ -267,10 +268,10 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.GetAsync($"/api/projects/{project.Id}/bugs");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var bugs = await response.Content.ReadFromJsonAsync<List<BugResponse>>();
-        Assert.NotNull(bugs);
-        Assert.Equal(2, bugs.Count);
+        bugs.Should().NotBeNull();
+        bugs.Should().HaveCount(2);
     }
 
     [Fact]
@@ -280,7 +281,7 @@ public class ProjectsControllerTests : IClassFixture<CustomWebApplicationFactory
         var response = await _client.GetAsync("/api/projects/99999/bugs");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     #endregion
