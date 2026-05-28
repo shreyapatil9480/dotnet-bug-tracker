@@ -55,9 +55,10 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Apply pending migrations
-using (var scope = app.Services.CreateScope())
+// Apply pending migrations (skip in Testing environment where EnsureCreated is used)
+if (!app.Environment.IsEnvironment("Testing"))
 {
+    using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<BugTrackerDbContext>();
     dbContext.Database.Migrate();
 }
