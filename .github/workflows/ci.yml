@@ -38,7 +38,7 @@ jobs:
           --collect:"XPlat Code Coverage" \
           --results-directory ./TestResults/UnitTests \
           --logger "trx;LogFileName=unit-tests.trx" \
-          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+          --settings coverlet.runsettings
 
     - name: Run integration tests with coverage
       run: |
@@ -48,7 +48,7 @@ jobs:
           --collect:"XPlat Code Coverage" \
           --results-directory ./TestResults/IntegrationTests \
           --logger "trx;LogFileName=integration-tests.trx" \
-          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+          --settings coverlet.runsettings
 
     - name: Upload coverage report
       uses: actions/upload-artifact@v4
