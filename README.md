@@ -1,5 +1,5 @@
 [![CI](https://github.com/shreyapatil9480/dotnet-bug-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/shreyapatil9480/dotnet-bug-tracker/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/shreyapatil9480/dotnet-bug-tracker/branch/main/graph/badge.svg)](https://codecov.io/gh/shreyapatil9480/dotnet-bug-tracker)
+[![codecov](https://codecov.io/gh/shreyapatil9480/dotnet-bug-tracker/branch/main/graph/badge.svg?token=C2GU5DZL5A)](https://codecov.io/gh/shreyapatil9480/dotnet-bug-tracker)
 
 # dotnet-bug-tracker
 
