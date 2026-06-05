@@ -62,8 +62,6 @@ if (!app.Environment.IsEnvironment("Testing"))
     var dbContext = scope.ServiceProvider.GetRequiredService<BugTrackerDbContext>();
     dbContext.Database.Migrate();
 }
-
-// Configure the HTTP request pipeline - Swagger enabled for all environments
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
