@@ -55,3 +55,40 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         }
     }
 }
+
+/// <summary>
+/// WebApplicationFactory configured for the Test environment (BDD reset endpoint).
+/// </summary>
+public class TestEnvironmentWebApplicationFactory : WebApplicationFactory<Program>
+{
+    private SqliteConnection? _connection;
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureServices(services =>
+        {
+            services.RemoveAll<DbContextOptions<BugTrackerDbContext>>();
+            services.RemoveAll<BugTrackerDbContext>();
+
+            _connection = new SqliteConnection("DataSource=:memory:");
+            _connection.Open();
+
+            services.AddDbContext<BugTrackerDbContext>(options =>
+            {
+                options.UseSqlite(_connection);
+            });
+        });
+
+        builder.UseEnvironment("Test");
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+
+        if (disposing)
+        {
+            _connection?.Dispose();
+        }
+    }
+}
