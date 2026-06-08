@@ -19,7 +19,7 @@ A fully tested **Bug Tracker REST API** built with **ASP.NET Core (.NET 8)**, **
 | **CI/CD** | GitHub Actions — build, test, and coverage on every push |
 | **Dependency Injection** | All services registered via .NET DI container |
 | **Swagger / OpenAPI** | Auto-generated interactive API docs |
-| **Code Coverage** | Coverlet — targeting 80%+ coverage |
+| **Code Coverage** | Coverlet — with Coverlet coverage reporting in CI |
 
 ---
 
@@ -151,7 +151,7 @@ Every push to `main` triggers the GitHub Actions workflow:
 
 ## Test Strategy
 
-The test suite targets **80%+ code coverage** and is structured in two layers:
+The test suite targets **Coverlet coverage reporting in CI** and is structured in two layers:
 
 ### Unit Tests (`BugTracker.UnitTests`)
 - Test service and business logic classes **in isolation**
